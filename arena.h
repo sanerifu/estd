@@ -23,7 +23,7 @@ extern void estd_arena_destroy(EstdArena** io_self);
 extern void estd_arena_destroyWrapper(void* data);
 
 #ifndef ESTD_CLEAN
-#define ESTD_CLEAN(f) __attribute__((ESTD_CLEANup(f##Wrapper)))
+#define ESTD_CLEAN(f) __attribute__((cleanup(f##Wrapper)))
 #endif
 
 #endif
