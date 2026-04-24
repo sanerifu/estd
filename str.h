@@ -2,6 +2,7 @@
 #define __ESTD_STRING_H__
 
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "arena.h"
@@ -28,6 +29,13 @@ extern EstdResult estd_string_format(EstdString* o_ret, EstdArena** allocator, c
 extern EstdResult estd_read_file(EstdString* o_ret, EstdArena** allocator, FILE* fp);
 extern EstdResult estd_string_url_decode(EstdString* o_ret, EstdString string, EstdArena** allocator);
 extern EstdResult estd_string_url_encode(EstdString* o_ret, EstdString string, EstdArena** allocator);
+extern void estd_string_tolower(EstdString mut_self);
+extern void estd_string_toupper(EstdString mut_self);
+extern bool estd_string_has_prefix(EstdString self, EstdString prefix);
+extern bool estd_string_has_suffix(EstdString self, EstdString suffix);
+extern void estd_string_reverse(EstdString mut_self);
+extern EstdResult estd_string_to_int(intmax_t* o_ret, EstdString self, int base);
+extern EstdResult estd_string_to_uint(uintmax_t* o_ret, EstdString self, int base);
 
 #endif
 
@@ -35,6 +43,7 @@ extern EstdResult estd_string_url_encode(EstdString* o_ret, EstdString string, E
 #define __ESTD_STRING_C__
 
 #include <ctype.h>
+#include <inttypes.h>
 #include <iso646.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -95,6 +104,125 @@ int estd_string_compare(EstdString left, EstdString right) {
     } else {
         return result;
     }
+}
+
+void estd_string_tolower(EstdString mut_self) {
+    for (size_t i = 0; i < mut_self.length; i++) {
+        mut_self.data[i] = tolower(mut_self.data[i]);
+    }
+}
+
+void estd_string_toupper(EstdString mut_self) {
+    for (size_t i = 0; i < mut_self.length; i++) {
+        mut_self.data[i] = toupper(mut_self.data[i]);
+    }
+}
+
+bool estd_string_has_prefix(EstdString self, EstdString prefix) {
+    if (self.length < prefix.length) {
+        return false;
+    }
+    for (size_t i = 0; i < prefix.length; i++) {
+        if (self.data[i] != prefix.data[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool estd_string_has_suffix(EstdString self, EstdString suffix) {
+    if (self.length < suffix.length) {
+        return false;
+    }
+    size_t diff = self.length - suffix.length;
+    for (size_t i = 0; i < suffix.length; i++) {
+        if (self.data[i + diff] != suffix.data[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void estd_string_reverse(EstdString mut_self) {
+    for (size_t i = 0; i < mut_self.length / 2; i++) {
+        char temp = mut_self.data[i];
+        mut_self.data[i] = mut_self.data[mut_self.length - 1 - i];
+        mut_self.data[mut_self.length - 1 - i] = temp;
+    }
+}
+
+EstdResult estd_string_to_int(intmax_t* o_ret, EstdString self, int base) {
+    intmax_t ret = 0;
+    int sign = 1;
+    while (self.length != 0 && isspace(self.data[0])) {
+        self.data += 1;
+        self.length -= 1;
+    }
+    if (self.length == 0) {
+        ESTD_THROW(ESTD_ILLEGAL_NUMBER, "%" PRIestr, ESTD_STRING_ARG(self));
+    }
+    if (self.length >= 2 && self.data[0] == '-') {
+        sign = -1;
+        self.length -= 1;
+        self.data += 1;
+    }
+    while (self.length != 0) {
+        int digit = 0;
+        if ('0' <= self.data[0] && self.data[0] <= '9') {
+            digit = self.data[0] - '0';
+        } else if ('a' <= self.data[0] && self.data[0] <= 'z') {
+            digit = self.data[0] - 'a' + 10;
+        } else if ('A' <= self.data[0] && self.data[0] <= 'Z') {
+            digit = self.data[0] - 'A' + 10;
+        } else {
+            ESTD_THROW(ESTD_ILLEGAL_NUMBER, "%" PRIestr, ESTD_STRING_ARG(self));
+        }
+        if (digit >= base) {
+            ESTD_THROW(ESTD_ILLEGAL_NUMBER, "%" PRIestr, ESTD_STRING_ARG(self));
+        }
+        if (ret > (INTMAX_MAX - digit) / base) {
+            ESTD_THROW(ESTD_OVERFLOW, "%" PRIestr, ESTD_STRING_ARG(self));
+        }
+        ret = base * ret + digit;
+        self.length -= 1;
+        self.data += 1;
+    }
+    *o_ret = sign * ret;
+    return ESTD_SUCCESS;
+}
+
+EstdResult estd_string_to_uint(uintmax_t* o_ret, EstdString self, int base) {
+    uintmax_t ret = 0;
+    while (self.length != 0 && isspace(self.data[0])) {
+        self.data += 1;
+        self.length -= 1;
+    }
+    if (self.length == 0) {
+        ESTD_THROW(ESTD_ILLEGAL_NUMBER, "%" PRIestr, ESTD_STRING_ARG(self));
+    }
+    while (self.length != 0) {
+        int digit = 0;
+        if ('0' <= self.data[0] && self.data[0] <= '9') {
+            digit = self.data[0] - '0';
+        } else if ('a' <= self.data[0] && self.data[0] <= 'z') {
+            digit = self.data[0] - 'a' + 10;
+        } else if ('A' <= self.data[0] && self.data[0] <= 'Z') {
+            digit = self.data[0] - 'A' + 10;
+        } else {
+            ESTD_THROW(ESTD_ILLEGAL_NUMBER, "%" PRIestr, ESTD_STRING_ARG(self));
+        }
+        if (digit >= base) {
+            ESTD_THROW(ESTD_ILLEGAL_NUMBER, "%" PRIestr, ESTD_STRING_ARG(self));
+        }
+        if (ret > (UINTMAX_MAX - digit) / base) {
+            ESTD_THROW(ESTD_OVERFLOW, "%" PRIestr, ESTD_STRING_ARG(self));
+        }
+        ret = base * ret + digit;
+        self.length -= 1;
+        self.data += 1;
+    }
+    *o_ret = ret;
+    return ESTD_SUCCESS;
 }
 
 EstdResult estd_string_duplicate(EstdString* o_ret, EstdString string, EstdArena** allocator) {
