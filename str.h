@@ -36,6 +36,7 @@ extern bool estd_string_has_suffix(EstdString self, EstdString suffix);
 extern void estd_string_reverse(EstdString mut_self);
 extern EstdResult estd_string_to_int(intmax_t* o_ret, EstdString self, int base);
 extern EstdResult estd_string_to_uint(uintmax_t* o_ret, EstdString self, int base);
+extern int estd_string_scan(EstdString self, char const* fmt, ...);
 
 #endif
 
@@ -48,6 +49,7 @@ extern EstdResult estd_string_to_uint(uintmax_t* o_ret, EstdString self, int bas
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 EstdString estd_string_split(EstdString* io_string, EstdString delimiter) {
     EstdString string = *io_string;
@@ -363,6 +365,17 @@ EstdResult estd_string_url_encode(EstdString* o_ret, EstdString string, EstdAren
     *o_ret = ret;
 
     return ESTD_SUCCESS;
+}
+
+int estd_string_scan(EstdString self, char const* fmt, ...) {
+    char* copy = (char*)calloc(self.length + 1, sizeof(char));
+    memcpy(copy, self.data, self.length);
+    va_list ap;
+    va_start(ap, fmt);
+    int result = vsscanf(copy, fmt, ap);
+    va_end(ap);
+    free(copy);
+    return result;
 }
 
 #endif
