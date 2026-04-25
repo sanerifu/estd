@@ -1,6 +1,7 @@
 #ifndef __ESTD_STRING_H__
 #define __ESTD_STRING_H__
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -47,8 +48,6 @@ extern int estd_string_scan(EstdString self, char const* fmt, ...);
 #include <inttypes.h>
 #include <iso646.h>
 #include <stdarg.h>
-#include <stdbool.h>
-#include <stdint.h>
 #include <stdlib.h>
 
 EstdString estd_string_split(EstdString* io_string, EstdString delimiter) {
