@@ -20,6 +20,7 @@ extern EstdResult estd_string_builder_appendf(EstdStringBuilder** io_self, EstdA
 extern EstdResult
 estd_string_builder_build(EstdString* o_ret, EstdStringBuilder const* const* i_self, EstdArena** allocator);
 extern size_t estd_string_builder_length(EstdStringBuilder* i_self);
+extern EstdResult estd_read_stream(EstdString* o_ret, EstdArena** allocator, FILE* fp);
 
 #endif
 
