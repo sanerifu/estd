@@ -6,25 +6,25 @@
 #define __STDC_WANT_LIB_EXT1__ 1
 #include <time.h>
 
-#if defined(_MSC_VER)
-#define GETTIME(to, fmt)                               \
-    do {                                               \
-        time_t ___now = time(NULL);                    \
-        struct tm ___tminfo;                           \
-        if (gmtime_s(&___tminfo, &___now) == 0) {      \
-            strftime(to, sizeof(to), fmt, &___tminfo); \
-        }                                              \
-    } while (0)
-#elif defined(__STDC_LIB_EXT1__) || (__STDC_VERSION__ >= 201112L)
-#define GETTIME(to, fmt)                               \
-    do {                                               \
-        time_t ___now = time(NULL);                    \
-        struct tm ___tminfo;                           \
-        if (gmtime_s(&___now, &___tminfo) != NULL) {   \
-            strftime(to, sizeof(to), fmt, &___tminfo); \
-        }                                              \
-    } while (0)
-#else
+// #if defined(_MSC_VER)
+// #define GETTIME(to, fmt)                               \
+//     do {                                               \
+//         time_t ___now = time(NULL);                    \
+//         struct tm ___tminfo;                           \
+//         if (gmtime_s(&___tminfo, &___now) == 0) {      \
+//             strftime(to, sizeof(to), fmt, &___tminfo); \
+//         }                                              \
+//     } while (0)
+// #elif defined(__STDC_LIB_EXT1__) || (__STDC_VERSION__ >= 201112L)
+// #define GETTIME(to, fmt)                               \
+//     do {                                               \
+//         time_t ___now = time(NULL);                    \
+//         struct tm ___tminfo;                           \
+//         if (gmtime_s(&___now, &___tminfo) != NULL) {   \
+//             strftime(to, sizeof(to), fmt, &___tminfo); \
+//         }                                              \
+//     } while (0)
+// #else
 #define GETTIME(to, fmt)                              \
     do {                                              \
         time_t ___now = time(NULL);                   \
@@ -33,7 +33,7 @@
             strftime(to, sizeof(to), fmt, ___tminfo); \
         }                                             \
     } while (0)
-#endif
+// #endif
 
 #define ESTD_LOG(file, color, reset, tag, fmt, ...)            \
     do {                                                       \
