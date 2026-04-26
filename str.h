@@ -177,10 +177,14 @@ EstdResult estd_string_to_int(intmax_t* o_ret, EstdString self, int base) {
         } else if ('A' <= self.data[0] && self.data[0] <= 'Z') {
             digit = self.data[0] - 'A' + 10;
         } else {
-            ESTD_THROW(ESTD_ILLEGAL_NUMBER, "%" PRIestr, ESTD_STRING_ARG(self));
+            self.length -= 1;
+            self.data += 1;
+            continue;
         }
         if (digit >= base) {
-            ESTD_THROW(ESTD_ILLEGAL_NUMBER, "%" PRIestr, ESTD_STRING_ARG(self));
+            self.length -= 1;
+            self.data += 1;
+            continue;
         }
         if (ret > (INTMAX_MAX - digit) / base) {
             ESTD_THROW(ESTD_OVERFLOW, "%" PRIestr, ESTD_STRING_ARG(self));
@@ -211,10 +215,14 @@ EstdResult estd_string_to_uint(uintmax_t* o_ret, EstdString self, int base) {
         } else if ('A' <= self.data[0] && self.data[0] <= 'Z') {
             digit = self.data[0] - 'A' + 10;
         } else {
-            ESTD_THROW(ESTD_ILLEGAL_NUMBER, "%" PRIestr, ESTD_STRING_ARG(self));
+            self.length -= 1;
+            self.data += 1;
+            continue;
         }
         if (digit >= base) {
-            ESTD_THROW(ESTD_ILLEGAL_NUMBER, "%" PRIestr, ESTD_STRING_ARG(self));
+            self.length -= 1;
+            self.data += 1;
+            continue;
         }
         if (ret > (UINTMAX_MAX - digit) / base) {
             ESTD_THROW(ESTD_OVERFLOW, "%" PRIestr, ESTD_STRING_ARG(self));
