@@ -84,13 +84,13 @@ EstdString estd_string_trim(EstdString string) {
     }
     size_t start = 0;
     size_t end = string.length - 1;
-    while (start < string.length and isblank(string.data[start])) {
+    while (start < string.length and isspace(string.data[start])) {
         start += 1;
     }
     if (start == string.length) {
         return ESTD_LITERAL("");
     }
-    while (end > 0 and isblank(string.data[end])) {
+    while (end > 0 and isspace(string.data[end])) {
         end -= 1;
     }
 
