@@ -23,10 +23,11 @@ extern size_t estd_string_builder_length(EstdStringBuilder* i_self);
 
 #endif
 
-#if (defined(ESTD_STRING_BUILDER_IMPLEMENTATION) || defined(ESTD_ALL_IMPLEMENTATION)) && \
+#if (!defined(ESTD_STRING_BUILDER_IMPLEMENTATION) || defined(ESTD_ALL_IMPLEMENTATION)) && \
     !defined(__ESTD_STRING_BUILDER_C__)
 #define __ESTD_STRING_BUILDER_C__
 
+#include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -103,6 +104,24 @@ EstdResult estd_string_builder_build(EstdString* o_ret, EstdStringBuilder const*
 
 size_t estd_string_builder_length(EstdStringBuilder* i_self) {
     return i_self == NULL ? 0 : i_self->total_length;
+}
+
+EstdResult estd_read_stream(EstdString* o_ret, EstdArena** allocator, FILE* fp) {
+    EstdStringBuilder* builder = NULL;
+    EstdArena* ESTD_CLEAN(estd_arena_destroy) temp = NULL;
+    char buf[BUFSIZ];
+    size_t size = 0;
+    while ((size = fread(buf, sizeof(char), sizeof(buf), fp))) {
+        estd_string_builder_append(&builder, ESTD_STRING(buf, size), &temp);
+        if (size < sizeof(buf)) {
+            if (ferror(fp)) {
+                ESTD_THROW(ESTD_IO_ERROR, "Could not read stream: %s", strerror(errno));
+            }
+            break;
+        }
+    }
+    ESTD_BUBBLE(estd_string_builder_build(o_ret, &builder, allocator), "Could not build the read stream");
+    return ESTD_SUCCESS;
 }
 
 #endif

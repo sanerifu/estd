@@ -41,7 +41,7 @@ extern int estd_string_scan(EstdString self, char const* fmt, ...);
 
 #endif
 
-#if (!defined(ESTD_STRING_IMPLEMENTATION) || defined(ESTD_ALL_IMPLEMENTATION)) && !defined(__ESTD_STRING_C__)
+#if (defined(ESTD_STRING_IMPLEMENTATION) || defined(ESTD_ALL_IMPLEMENTATION)) && !defined(__ESTD_STRING_C__)
 #define __ESTD_STRING_C__
 
 #include <ctype.h>
