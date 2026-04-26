@@ -21,6 +21,7 @@ struct EstdString {
 #define ESTD_CHAR(c) ESTD_STRING(((char[]){(c)}), 1)
 #define ESTD_STRING_ARG(s) (int)((s).length), (s).data
 #define PRIestr ".*s"
+#define ESTD_SLICE(str, start, stop) ((EstdString){.length = ((stop) - (start)), .data = ((str).data + (start))})
 
 extern EstdString estd_string_split(EstdString* io_string, EstdString delimiter);
 extern EstdString estd_string_trim(EstdString string);
