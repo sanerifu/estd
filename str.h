@@ -39,6 +39,7 @@ extern void estd_string_reverse(EstdString mut_self);
 extern EstdResult estd_string_to_int(intmax_t* o_ret, EstdString self, int base);
 extern EstdResult estd_string_to_uint(uintmax_t* o_ret, EstdString self, int base);
 extern int estd_string_scan(EstdString self, char const* fmt, ...);
+extern EstdString estd_path_get_filename(EstdString path);
 
 #endif
 
@@ -384,6 +385,17 @@ int estd_string_scan(EstdString self, char const* fmt, ...) {
     va_end(ap);
     free(copy);
     return result;
+}
+
+EstdString estd_path_get_filename(EstdString path) {
+    int start = path.length; // loop starts with a check, so start by overshooting
+    while(start --> 0) {
+        if(path.data[start] == '/') {
+            break;
+        }
+    }
+    start += 1; // if / found, exclude it, it not, start becomes -1
+    return ESTD_SLICE(path, start, path.length);
 }
 
 #endif
