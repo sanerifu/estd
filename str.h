@@ -40,10 +40,11 @@ extern EstdResult estd_string_to_int(intmax_t* o_ret, EstdString self, int base)
 extern EstdResult estd_string_to_uint(uintmax_t* o_ret, EstdString self, int base);
 extern int estd_string_scan(EstdString self, char const* fmt, ...);
 extern EstdString estd_path_get_filename(EstdString path);
+extern uint32_t estd_crc32(EstdString input);
 
 #endif
 
-#if (defined(ESTD_STRING_IMPLEMENTATION) || defined(ESTD_ALL_IMPLEMENTATION)) && !defined(__ESTD_STRING_C__)
+#if (!defined(ESTD_STRING_IMPLEMENTATION) || defined(ESTD_ALL_IMPLEMENTATION)) && !defined(__ESTD_STRING_C__)
 #define __ESTD_STRING_C__
 
 #include <ctype.h>
@@ -51,6 +52,7 @@ extern EstdString estd_path_get_filename(EstdString path);
 #include <iso646.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <threads.h>
 
 EstdString estd_string_split(EstdString* io_string, EstdString delimiter) {
     EstdString string = *io_string;
@@ -396,6 +398,37 @@ EstdString estd_path_get_filename(EstdString path) {
     }
     start += 1; // if / found, exclude it, it not, start becomes -1
     return ESTD_SLICE(path, start, path.length);
+}
+
+// CRC-32 from https://en.wikipedia.org/wiki/Computation_of_cyclic_redundancy_checks#CRC-32_example
+
+static thread_local uint32_t CRCTable[256];
+
+static void CRC32_init(void) {
+	uint32_t crc32 = 1;
+    // C guarantees CRCTable[0] = 0 already.
+	for (unsigned int i = 128; i; i >>= 1) {
+		crc32 = (crc32 >> 1) ^ (crc32 & 1 ? 0xedb88320 : 0);
+		for (unsigned int j = 0; j < 256; j += 2*i)
+        	CRCTable[i + j] = crc32 ^ CRCTable[j];
+	}
+}
+
+uint32_t estd_crc32(EstdString input) {
+    uint32_t crc32 = 0xFFFFFFFFu;
+    uint8_t const* data = (uint8_t const*)input.data;
+
+	if (CRCTable[255] == 0)
+		CRC32_init();
+	
+	for (size_t i = 0; i < input.length; i++) {
+		crc32 ^= data[i];
+		crc32 = (crc32 >> 8) ^ CRCTable[crc32 & 0xFF];
+	}
+	
+	// Finalize the CRC-32 value by inverting all the bits
+	crc32 ^= 0xFFFFFFFFu;
+	return crc32;
 }
 
 #endif
