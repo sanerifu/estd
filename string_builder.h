@@ -20,10 +20,11 @@ extern EstdResult estd_string_builder_appendf(EstdStringBuilder** io_self, EstdA
 extern EstdResult estd_string_builder_build(EstdString* o_ret, EstdStringBuilder** i_self, EstdArena** allocator);
 extern size_t estd_string_builder_length(EstdStringBuilder* i_self);
 extern EstdResult estd_read_stream(EstdString* o_ret, EstdArena** allocator, FILE* fp);
+extern EstdResult estd_string_builder_write(EstdStringBuilder** i_self, FILE* fp);
 
 #endif
 
-#if (!defined(ESTD_STRING_BUILDER_IMPLEMENTATION) || defined(ESTD_ALL_IMPLEMENTATION)) && \
+#if (defined(ESTD_STRING_BUILDER_IMPLEMENTATION) || defined(ESTD_ALL_IMPLEMENTATION)) && \
     !defined(__ESTD_STRING_BUILDER_C__)
 #define __ESTD_STRING_BUILDER_C__
 
@@ -121,6 +122,28 @@ EstdResult estd_read_stream(EstdString* o_ret, EstdArena** allocator, FILE* fp) 
         }
     }
     ESTD_BUBBLE(estd_string_builder_build(o_ret, &builder, allocator), "Could not build the read stream");
+    return ESTD_SUCCESS;
+}
+
+EstdResult estd_string_builder_write(EstdStringBuilder** i_self, FILE* fp) {
+    EstdStringBuilder* self = *i_self;
+    EstdStringBuilder* next = NULL;
+    while (self != NULL) {
+        EstdStringBuilder* prev = self->prev;
+        self->prev = next;
+        next = self;
+        self = prev;
+    }
+
+    self = next;
+    next = NULL;
+    while (self != NULL) {
+        fwrite(self->data, sizeof(char), self->length, fp);
+        EstdStringBuilder* prev = self->prev;
+        self->prev = next;
+        next = self;
+        self = prev;
+    }
     return ESTD_SUCCESS;
 }
 
