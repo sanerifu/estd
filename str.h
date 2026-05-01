@@ -52,7 +52,6 @@ extern uint32_t estd_crc32(EstdString input);
 #include <iso646.h>
 #include <stdarg.h>
 #include <stdlib.h>
-#include <threads.h>
 
 EstdString estd_string_split(EstdString* io_string, EstdString delimiter) {
     EstdString string = *io_string;
@@ -402,7 +401,7 @@ EstdString estd_path_get_filename(EstdString path) {
 
 // CRC-32 from https://en.wikipedia.org/wiki/Computation_of_cyclic_redundancy_checks#CRC-32_example
 
-static thread_local uint32_t CRCTable[256];
+static _Thread_local uint32_t CRCTable[256];
 
 static void CRC32_init(void) {
 	uint32_t crc32 = 1;
