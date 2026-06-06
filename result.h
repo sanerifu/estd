@@ -10,7 +10,8 @@ typedef enum {
     ESTD_ILLEGAL_NUMBER,
     ESTD_OVERFLOW,
     ESTD_IO_ERROR,
-    ESTD_MISSING_ARG
+    ESTD_MISSING_ARGUMENT,
+    ESTD_UNKNOWN_ARGUMENT
 } EstdResult;
 
 #define ESTD_THROW(result, fmt, ...)                 \
