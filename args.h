@@ -6,7 +6,7 @@
 
 #include "str.h"
 
-#define ___ESTD_EVAL(...) __VA_ARGS__
+#include "meta.h"
 
 #define ___ESTD_ARGS_NAMED_HELP_GENERATOR(name, description, action) "\t--" #name "=\t" description "\n"
 #define ___ESTD_ARGS_NAMED_HELP_SEPARATOR
@@ -88,7 +88,7 @@
  * @example
  * #define EXAMPLE_NAMED_ARGS(ARG, SEP) ARG(foo, "This is foo's description", (do_something_with_foo(value))) SEP ARG(bar, "This is bar's description", ())
  * #define EXAMPLE_POS_ARGS(ARG, SEP) ARG(baz, "Baz, this is", (printf("Baz is %" PRIestr "\n", ESTD_STRING_ARG(arg)))) SEP ARG(another, "", ())
- * ESTD_GENERATE_ARGUMENT_PARSER(my_parser_fun, (int), EXAMPLE_NAMED_ARGS, ESTD_NO_ARGUMENT, ESTD_NO_ARGUMENT, EXAMPLE_POS_ARGS)
+ * ESTD_GENERATE_ARGUMENT_PARSER(my_parser_fun, (int), EXAMPLE_NAMED_ARGS, ESTD_NONE, ESTD_NONE, EXAMPLE_POS_ARGS)
  * // which generates `my_parser_fun`, taking argc, argv and unnamed int. Can be used like:
  * ESTD_BUBBLE(my_parser_fun(argc, argv, 0), "Could not parse command line arguments");
  */
@@ -167,7 +167,5 @@
         );                                                                                                                                                      \
         return ESTD_SUCCESS;                                                                                                                                    \
     }
-
-#define ESTD_NO_ARGUMENT(ARG, SEP)
 
 #endif
