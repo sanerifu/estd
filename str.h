@@ -56,13 +56,48 @@ extern uint32_t estd_crc32(EstdString input);
 EstdString estd_string_split(EstdString* io_string, EstdString delimiter) {
     EstdString string = *io_string;
     if (string.length < delimiter.length) {
-        return ESTD_STRING(NULL, 0);
+        *io_string = ESTD_STRING(NULL, 0);
+        return string;
     }
     EstdString ret = ESTD_STRING(string.data, 0);
     bool found = false;
 
     while ((string.length - ret.length) >= delimiter.length) {
         if (memcmp(string.data + ret.length, delimiter.data, delimiter.length) == 0) {
+            found = true;
+            break;
+        }
+        ret.length += 1;
+    }
+
+    if (found) {
+        string.length -= ret.length + delimiter.length;
+        string.data += ret.length + delimiter.length;
+    } else {
+        ret.length = string.length;
+        string.length = 0;
+    }
+
+    *io_string = string;
+    return ret;
+}
+
+EstdString estd_string_escapable_split(EstdString* io_string, EstdString delimiter, char escape) {
+    EstdString string = *io_string;
+    if (string.length < delimiter.length) {
+        *io_string = ESTD_STRING(NULL, 0);
+        return string;
+    }
+    EstdString ret = ESTD_STRING(string.data, 0);
+    bool found = false;
+
+    while ((string.length - ret.length) >= delimiter.length) {
+        if(string.data[ret.length] == escape) {
+            ret.length += 1;
+            if(ret.length == string.length) {
+                break;
+            }
+        } else if (memcmp(string.data + ret.length, delimiter.data, delimiter.length) == 0) {
             found = true;
             break;
         }
@@ -389,13 +424,13 @@ int estd_string_scan(EstdString self, char const* fmt, ...) {
 }
 
 EstdString estd_path_get_filename(EstdString path) {
-    int start = path.length; // loop starts with a check, so start by overshooting
-    while(start --> 0) {
-        if(path.data[start] == '/') {
+    int start = path.length;  // loop starts with a check, so start by overshooting
+    while (start-- > 0) {
+        if (path.data[start] == '/') {
             break;
         }
     }
-    start += 1; // if / found, exclude it, it not, start becomes -1
+    start += 1;  // if / found, exclude it, it not, start becomes -1
     return ESTD_SLICE(path, start, path.length);
 }
 
@@ -404,30 +439,29 @@ EstdString estd_path_get_filename(EstdString path) {
 static _Thread_local uint32_t CRCTable[256];
 
 static void CRC32_init(void) {
-	uint32_t crc32 = 1;
+    uint32_t crc32 = 1;
     // C guarantees CRCTable[0] = 0 already.
-	for (unsigned int i = 128; i; i >>= 1) {
-		crc32 = (crc32 >> 1) ^ (crc32 & 1 ? 0xedb88320 : 0);
-		for (unsigned int j = 0; j < 256; j += 2*i)
-        	CRCTable[i + j] = crc32 ^ CRCTable[j];
-	}
+    for (unsigned int i = 128; i; i >>= 1) {
+        crc32 = (crc32 >> 1) ^ (crc32 & 1 ? 0xedb88320 : 0);
+        for (unsigned int j = 0; j < 256; j += 2 * i) CRCTable[i + j] = crc32 ^ CRCTable[j];
+    }
 }
 
 uint32_t estd_crc32(EstdString input) {
     uint32_t crc32 = 0xFFFFFFFFu;
     uint8_t const* data = (uint8_t const*)input.data;
 
-	if (CRCTable[255] == 0)
-		CRC32_init();
-	
-	for (size_t i = 0; i < input.length; i++) {
-		crc32 ^= data[i];
-		crc32 = (crc32 >> 8) ^ CRCTable[crc32 & 0xFF];
-	}
-	
-	// Finalize the CRC-32 value by inverting all the bits
-	crc32 ^= 0xFFFFFFFFu;
-	return crc32;
+    if (CRCTable[255] == 0)
+        CRC32_init();
+
+    for (size_t i = 0; i < input.length; i++) {
+        crc32 ^= data[i];
+        crc32 = (crc32 >> 8) ^ CRCTable[crc32 & 0xFF];
+    }
+
+    // Finalize the CRC-32 value by inverting all the bits
+    crc32 ^= 0xFFFFFFFFu;
+    return crc32;
 }
 
 #endif
