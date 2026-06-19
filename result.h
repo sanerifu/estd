@@ -23,7 +23,7 @@ typedef enum {
 #define ESTD_BUBBLE(expr, fmt, ...)                         \
     do {                                                    \
         EstdResult ___estdmacro_result;                     \
-        if ((___estdmacro_result = expr) != ESTD_SUCCESS) { \
+        if ((___estdmacro_result = (EstdResult)(expr)) != ESTD_SUCCESS) { \
             ESTD_TRACE(fmt, ##__VA_ARGS__);                 \
             return ___estdmacro_result;                     \
         }                                                   \
