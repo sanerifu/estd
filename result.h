@@ -20,13 +20,13 @@ typedef enum {
         return result;                               \
     } while (0)
 
-#define ESTD_BUBBLE(expr, fmt, ...)                         \
-    do {                                                    \
-        EstdResult ___estdmacro_result;                     \
+#define ESTD_BUBBLE(expr, fmt, ...)                                       \
+    do {                                                                  \
+        EstdResult ___estdmacro_result;                                   \
         if ((___estdmacro_result = (EstdResult)(expr)) != ESTD_SUCCESS) { \
-            ESTD_TRACE(fmt, ##__VA_ARGS__);                 \
-            return ___estdmacro_result;                     \
-        }                                                   \
+            ESTD_TRACE(fmt, ##__VA_ARGS__);                               \
+            return ___estdmacro_result;                                   \
+        }                                                                 \
     } while (0)
 
 #define ESTD_ASSERT(result, expr, fmt, ...)                                           \
@@ -37,12 +37,12 @@ typedef enum {
         }                                                                             \
     } while (0)
 
-#define ESTD_PANIC(result, expr, fmt, ...)                                            \
-    do {                                                                              \
-        if (!(expr)) {                                                                \
-            ESTD_ASSERTION("Assertion (" #expr ") " #result ": " fmt, ##__VA_ARGS__); \
-            abort();                                                                  \
-        }                                                                             \
+#define ESTD_PANIC(expr, fmt, ...)                                              \
+    do {                                                                        \
+        if (!(expr)) {                                                          \
+            ESTD_ASSERTION("Aborting due to (" #expr "): " fmt, ##__VA_ARGS__); \
+            abort();                                                            \
+        }                                                                       \
     } while (0)
 
 #endif
