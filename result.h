@@ -2,6 +2,7 @@
 #define __ESTD_RESULT_H__
 
 #include "log.h"
+#include <stdlib.h>
 
 typedef enum {
     ESTD_SUCCESS,
@@ -37,7 +38,7 @@ typedef enum {
         }                                                                             \
     } while (0)
 
-#define ESTD_PANIC(expr, fmt, ...)                                              \
+#define ESTD_ASSERT_PANIC(expr, fmt, ...)                                              \
     do {                                                                        \
         if (!(expr)) {                                                          \
             ESTD_ASSERTION("Aborting due to (" #expr "): " fmt, ##__VA_ARGS__); \
