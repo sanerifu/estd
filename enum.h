@@ -19,15 +19,15 @@
     }
 #define ___ESTD_ENUM_TOSTRING_SEP else
 
-#define ___ESTD_ENUM_NOVALUE_FROMSTRING_APPLY(name)           \
-    if (estd_string_compare(ESTD_LITERAL(#name), val) == 0) { \
-        *result = name;                                       \
-        return ESTD_SUCCESS;                                  \
+#define ___ESTD_ENUM_NOVALUE_FROMSTRING_APPLY(name)         \
+    if (estdStringCompare(ESTD_LITERAL(#name), val) == 0) { \
+        *result = name;                                     \
+        return ESTD_SUCCESS;                                \
     }
-#define ___ESTD_ENUM_VALUE_FROMSTRING_APPLY(name, value)      \
-    if (estd_string_compare(ESTD_LITERAL(#name), val) == 0) { \
-        *result = name;                                       \
-        return ESTD_SUCCESS;                                  \
+#define ___ESTD_ENUM_VALUE_FROMSTRING_APPLY(name, value)    \
+    if (estdStringCompare(ESTD_LITERAL(#name), val) == 0) { \
+        *result = name;                                     \
+        return ESTD_SUCCESS;                                \
     }
 #define ___ESTD_ENUM_FROMSTRING_SEP else
 

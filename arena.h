@@ -13,14 +13,14 @@ struct EstdArena {
     char data[];
 };
 
-extern EstdResult estd_arena_allocate(void** o_ret, EstdArena** io_self, size_t size, size_t alignment);
-#define estd_arena_new(o_ret, io_self) estd_arena_allocate((void**)o_ret, io_self, sizeof(**o_ret), alignof(**o_ret))
-#define estd_arena_array(o_ret, io_self, length) \
-    estd_arena_allocate((void**)o_ret, io_self, sizeof(**o_ret) * (length), alignof(**o_ret))
-#define estd_arena_fsm(o_ret, io_self, size) \
-    estd_arena_allocate((void**)o_ret, io_self, sizeof(**o_ret) + size, alignof(**o_ret))
-extern void estd_arena_destroy(EstdArena** io_self);
-extern void estd_arena_destroyWrapper(void* data);
+extern EstdResult estdArenaAllocate(void** o_ret, EstdArena** io_self, size_t size, size_t alignment);
+#define estdArenaNew(o_ret, io_self) estdArenaAllocate((void**)o_ret, io_self, sizeof(**o_ret), alignof(**o_ret))
+#define estdArenaArray(o_ret, io_self, length) \
+    estdArenaAllocate((void**)o_ret, io_self, sizeof(**o_ret) * (length), alignof(**o_ret))
+#define estdArenaFsm(o_ret, io_self, size) \
+    estdArenaAllocate((void**)o_ret, io_self, sizeof(**o_ret) + size, alignof(**o_ret))
+extern void estdArenaDestroy(EstdArena** io_self);
+extern void estdArenaDestroyWrapper(void* data);
 
 #ifndef ESTD_CLEAN
 #define ESTD_CLEAN(f) __attribute__((cleanup(f##Wrapper)))
@@ -31,7 +31,7 @@ extern void estd_arena_destroyWrapper(void* data);
 #if (defined(ESTD_ARENA_IMPLEMENTATION) || defined(ESTD_ALL_IMPLEMENTATION)) && !defined(__ESTD_ARENA_C__)
 #define __ESTD_ARENA_C__
 
-// #undef estd_arena_allocate
+// #undef estdArenaAllocate
 
 #include <stdalign.h>
 #include <stdint.h>
@@ -41,7 +41,7 @@ static uintptr_t align(uintptr_t value, size_t alignment) {
     return (value + (alignment - 1)) & ~(alignment - 1);
 }
 
-EstdResult estd_arena_allocate(void** o_ret, EstdArena** io_self, size_t size, size_t alignment) {
+EstdResult estdArenaAllocate(void** o_ret, EstdArena** io_self, size_t size, size_t alignment) {
     EstdArena* self = *io_self;
     if (self == NULL) {
         self = (EstdArena*)calloc(1, sizeof(EstdArena) + size + alignment);
@@ -84,7 +84,7 @@ EstdResult estd_arena_allocate(void** o_ret, EstdArena** io_self, size_t size, s
     return ESTD_SUCCESS;
 }
 
-void estd_arena_destroy(EstdArena** io_self) {
+void estdArenaDestroy(EstdArena** io_self) {
     EstdArena* self = *io_self;
     while (self != NULL) {
         EstdArena* prev = self->prev;
@@ -94,8 +94,8 @@ void estd_arena_destroy(EstdArena** io_self) {
     *io_self = NULL;
 }
 
-void estd_arena_destroyWrapper(void* data) {
-    estd_arena_destroy((EstdArena**)data);
+void estdArenaDestroyWrapper(void* data) {
+    estdArenaDestroy((EstdArena**)data);
 }
 
 #endif

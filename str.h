@@ -23,24 +23,24 @@ struct EstdString {
 #define PRIestr ".*s"
 #define ESTD_SLICE(str, start, stop) ((EstdString){.length = ((stop) - (start)), .data = ((str).data + (start))})
 
-extern EstdString estd_string_split(EstdString* io_string, EstdString delimiter);
-extern EstdString estd_string_trim(EstdString string);
-extern int estd_string_compare(EstdString left, EstdString right);
-extern EstdResult estd_string_duplicate(EstdString* o_ret, EstdString string, EstdArena** allocator);
-extern EstdResult estd_string_format(EstdString* o_ret, EstdArena** allocator, char const* fmt, ...);
-extern EstdResult estd_read_file(EstdString* o_ret, EstdArena** allocator, FILE* fp);
-extern EstdResult estd_string_url_decode(EstdString* o_ret, EstdString string, EstdArena** allocator);
-extern EstdResult estd_string_url_encode(EstdString* o_ret, EstdString string, EstdArena** allocator);
-extern void estd_string_tolower(EstdString mut_self);
-extern void estd_string_toupper(EstdString mut_self);
-extern bool estd_string_has_prefix(EstdString self, EstdString prefix);
-extern bool estd_string_has_suffix(EstdString self, EstdString suffix);
-extern void estd_string_reverse(EstdString mut_self);
-extern EstdResult estd_string_to_int(intmax_t* o_ret, EstdString self, int base);
-extern EstdResult estd_string_to_uint(uintmax_t* o_ret, EstdString self, int base);
-extern int estd_string_scan(EstdString self, char const* fmt, ...);
-extern EstdString estd_path_get_filename(EstdString path);
-extern uint32_t estd_crc32(EstdString input);
+extern EstdString estdStringSplit(EstdString* io_string, EstdString delimiter);
+extern EstdString estdStringTrim(EstdString string);
+extern int estdStringCompare(EstdString left, EstdString right);
+extern EstdResult estdStringDuplicate(EstdString* o_ret, EstdString string, EstdArena** allocator);
+extern EstdResult estdStringFormat(EstdString* o_ret, EstdArena** allocator, char const* fmt, ...);
+extern EstdResult estdReadFile(EstdString* o_ret, EstdArena** allocator, FILE* fp);
+extern EstdResult estdStringUrlDecode(EstdString* o_ret, EstdString string, EstdArena** allocator);
+extern EstdResult estdStringUrlEncode(EstdString* o_ret, EstdString string, EstdArena** allocator);
+extern void estdStringToLower(EstdString mut_self);
+extern void estdStringToUpper(EstdString mut_self);
+extern bool estdStringHasPrefix(EstdString self, EstdString prefix);
+extern bool estdStringHasSuffix(EstdString self, EstdString suffix);
+extern void estdStringReverse(EstdString mut_self);
+extern EstdResult estdStringToInt(intmax_t* o_ret, EstdString self, int base);
+extern EstdResult estdStringToUint(uintmax_t* o_ret, EstdString self, int base);
+extern int estdStringScan(EstdString self, char const* fmt, ...);
+extern EstdString estdPathGetFilename(EstdString path);
+extern uint32_t estdCrc32(EstdString input);
 
 #endif
 
@@ -53,7 +53,7 @@ extern uint32_t estd_crc32(EstdString input);
 #include <stdarg.h>
 #include <stdlib.h>
 
-EstdString estd_string_split(EstdString* io_string, EstdString delimiter) {
+EstdString estdStringSplit(EstdString* io_string, EstdString delimiter) {
     EstdString string = *io_string;
     if (string.length < delimiter.length) {
         *io_string = ESTD_STRING(NULL, 0);
@@ -92,9 +92,9 @@ EstdString estd_string_escapable_split(EstdString* io_string, EstdString delimit
     bool found = false;
 
     while ((string.length - ret.length) >= delimiter.length) {
-        if(string.data[ret.length] == escape) {
+        if (string.data[ret.length] == escape) {
             ret.length += 1;
-            if(ret.length == string.length) {
+            if (ret.length == string.length) {
                 break;
             }
         } else if (memcmp(string.data + ret.length, delimiter.data, delimiter.length) == 0) {
@@ -116,7 +116,7 @@ EstdString estd_string_escapable_split(EstdString* io_string, EstdString delimit
     return ret;
 }
 
-EstdString estd_string_trim(EstdString string) {
+EstdString estdStringTrim(EstdString string) {
     if (string.length == 0) {
         return string;
     }
@@ -135,7 +135,7 @@ EstdString estd_string_trim(EstdString string) {
     return ESTD_STRING(string.data + start, end - start + 1);
 }
 
-int estd_string_compare(EstdString left, EstdString right) {
+int estdStringCompare(EstdString left, EstdString right) {
     size_t min_length = left.length < right.length ? left.length : right.length;
     int result = memcmp(left.data, right.data, min_length);
     if (result == 0) {
@@ -145,19 +145,19 @@ int estd_string_compare(EstdString left, EstdString right) {
     }
 }
 
-void estd_string_tolower(EstdString mut_self) {
+void estdStringToLower(EstdString mut_self) {
     for (size_t i = 0; i < mut_self.length; i++) {
         mut_self.data[i] = tolower(mut_self.data[i]);
     }
 }
 
-void estd_string_toupper(EstdString mut_self) {
+void estdStringToUpper(EstdString mut_self) {
     for (size_t i = 0; i < mut_self.length; i++) {
         mut_self.data[i] = toupper(mut_self.data[i]);
     }
 }
 
-bool estd_string_has_prefix(EstdString self, EstdString prefix) {
+bool estdStringHasPrefix(EstdString self, EstdString prefix) {
     if (self.length < prefix.length) {
         return false;
     }
@@ -169,7 +169,7 @@ bool estd_string_has_prefix(EstdString self, EstdString prefix) {
     return true;
 }
 
-bool estd_string_has_suffix(EstdString self, EstdString suffix) {
+bool estdStringHasSuffix(EstdString self, EstdString suffix) {
     if (self.length < suffix.length) {
         return false;
     }
@@ -182,7 +182,7 @@ bool estd_string_has_suffix(EstdString self, EstdString suffix) {
     return true;
 }
 
-void estd_string_reverse(EstdString mut_self) {
+void estdStringReverse(EstdString mut_self) {
     for (size_t i = 0; i < mut_self.length / 2; i++) {
         char temp = mut_self.data[i];
         mut_self.data[i] = mut_self.data[mut_self.length - 1 - i];
@@ -190,7 +190,7 @@ void estd_string_reverse(EstdString mut_self) {
     }
 }
 
-EstdResult estd_string_to_int(intmax_t* o_ret, EstdString self, int base) {
+EstdResult estdStringToInt(intmax_t* o_ret, EstdString self, int base) {
     intmax_t ret = 0;
     int sign = 1;
     while (self.length != 0 && isspace(self.data[0])) {
@@ -234,7 +234,7 @@ EstdResult estd_string_to_int(intmax_t* o_ret, EstdString self, int base) {
     return ESTD_SUCCESS;
 }
 
-EstdResult estd_string_to_uint(uintmax_t* o_ret, EstdString self, int base) {
+EstdResult estdStringToUint(uintmax_t* o_ret, EstdString self, int base) {
     uintmax_t ret = 0;
     while (self.length != 0 && isspace(self.data[0])) {
         self.data += 1;
@@ -272,9 +272,9 @@ EstdResult estd_string_to_uint(uintmax_t* o_ret, EstdString self, int base) {
     return ESTD_SUCCESS;
 }
 
-EstdResult estd_string_duplicate(EstdString* o_ret, EstdString string, EstdArena** allocator) {
+EstdResult estdStringDuplicate(EstdString* o_ret, EstdString string, EstdArena** allocator) {
     EstdString ret;
-    ESTD_BUBBLE(estd_arena_array(&ret.data, allocator, string.length + 1), "Could not duplicate string");
+    ESTD_BUBBLE(estdArenaArray(&ret.data, allocator, string.length + 1), "Could not duplicate string");
     memcpy(ret.data, string.data, string.length);
     ret.length = string.length;
     ret.data[ret.length] = '\0';
@@ -282,14 +282,14 @@ EstdResult estd_string_duplicate(EstdString* o_ret, EstdString string, EstdArena
     return ESTD_SUCCESS;
 }
 
-EstdResult estd_string_format(EstdString* o_ret, EstdArena** allocator, char const* fmt, ...) {
+EstdResult estdStringFormat(EstdString* o_ret, EstdArena** allocator, char const* fmt, ...) {
     va_list ap;
     va_start(ap, fmt);
     size_t length = vsnprintf(NULL, 0, fmt, ap);
     va_end(ap);
 
     EstdString ret;
-    ESTD_BUBBLE(estd_arena_array(&ret.data, allocator, length + 1), "Could not allocate formatted string");
+    ESTD_BUBBLE(estdArenaArray(&ret.data, allocator, length + 1), "Could not allocate formatted string");
 
     va_start(ap, fmt);
     ret.length = length;
@@ -301,13 +301,13 @@ EstdResult estd_string_format(EstdString* o_ret, EstdArena** allocator, char con
     return ESTD_SUCCESS;
 }
 
-EstdResult estd_read_file(EstdString* o_ret, EstdArena** allocator, FILE* fp) {
+EstdResult estdReadFile(EstdString* o_ret, EstdArena** allocator, FILE* fp) {
     EstdString ret;
 
     fseek(fp, 0, SEEK_END);
     ret.length = ftell(fp);
     fseek(fp, 0, SEEK_SET);
-    ESTD_BUBBLE(estd_arena_array(&ret.data, allocator, ret.length + 1), "Could not create buffer to read file");
+    ESTD_BUBBLE(estdArenaArray(&ret.data, allocator, ret.length + 1), "Could not create buffer to read file");
 
     fread(ret.data, sizeof(char), ret.length, fp);
     ret.data[ret.length] = '\0';
@@ -330,9 +330,9 @@ static uint8_t hex2byte(char upper, char lower) {
     return (hex2nibble(upper) << 4) | (hex2nibble(lower));
 }
 
-EstdResult estd_string_url_decode(EstdString* o_ret, EstdString string, EstdArena** allocator) {
+EstdResult estdStringUrlDecode(EstdString* o_ret, EstdString string, EstdArena** allocator) {
     EstdString ret;
-    ESTD_BUBBLE(estd_arena_array(&ret.data, allocator, string.length), "Could not allocate decoded string");
+    ESTD_BUBBLE(estdArenaArray(&ret.data, allocator, string.length), "Could not allocate decoded string");
     ret.length = 0;
 
     for (size_t i = 0; i < string.length; i++) {
@@ -373,13 +373,13 @@ static uint16_t byte2hex(uint8_t byte) {
     return (upper << 8) | lower;
 }
 
-EstdResult estd_string_url_encode(EstdString* o_ret, EstdString string, EstdArena** allocator) {
+EstdResult estdStringUrlEncode(EstdString* o_ret, EstdString string, EstdArena** allocator) {
     EstdString ret;
 
     EstdString temp;
-    EstdArena* ESTD_CLEAN(estd_arena_destroy) temp_allocator = {0};
+    EstdArena* ESTD_CLEAN(estdArenaDestroy) temp_allocator = {0};
     ESTD_BUBBLE(
-        estd_arena_array(&temp.data, &temp_allocator, string.length * 3),
+        estdArenaArray(&temp.data, &temp_allocator, string.length * 3),
         "Could not allocate temporary encoded string"
     );
     temp.length = 0;
@@ -402,7 +402,7 @@ EstdResult estd_string_url_encode(EstdString* o_ret, EstdString string, EstdAren
         }
     }
 
-    ESTD_BUBBLE(estd_arena_array(&ret.data, allocator, temp.length + 1), "Could not allocate encoded string");
+    ESTD_BUBBLE(estdArenaArray(&ret.data, allocator, temp.length + 1), "Could not allocate encoded string");
     ret.length = temp.length;
     memcpy(ret.data, temp.data, temp.length * sizeof(char));
     ret.data[ret.length] = '\0';
@@ -412,7 +412,7 @@ EstdResult estd_string_url_encode(EstdString* o_ret, EstdString string, EstdAren
     return ESTD_SUCCESS;
 }
 
-int estd_string_scan(EstdString self, char const* fmt, ...) {
+int estdStringScan(EstdString self, char const* fmt, ...) {
     char* copy = (char*)calloc(self.length + 1, sizeof(char));
     memcpy(copy, self.data, self.length);
     va_list ap;
@@ -423,7 +423,7 @@ int estd_string_scan(EstdString self, char const* fmt, ...) {
     return result;
 }
 
-EstdString estd_path_get_filename(EstdString path) {
+EstdString estdPathGetFilename(EstdString path) {
     int start = path.length;  // loop starts with a check, so start by overshooting
     while (start-- > 0) {
         if (path.data[start] == '/') {
@@ -447,7 +447,7 @@ static void CRC32_init(void) {
     }
 }
 
-uint32_t estd_crc32(EstdString input) {
+uint32_t estdCrc32(EstdString input) {
     uint32_t crc32 = 0xFFFFFFFFu;
     uint8_t const* data = (uint8_t const*)input.data;
 
