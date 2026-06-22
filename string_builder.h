@@ -18,7 +18,7 @@ struct EstdStringBuilder {
 extern EstdResult estdStringBuilderAppend(EstdStringBuilder** io_self, EstdString string, EstdArena** allocator);
 extern EstdResult estdStringBuilderAppendf(EstdStringBuilder** io_self, EstdArena** allocator, char const* fmt, ...);
 extern EstdResult estdStringBuilderBuild(EstdString* o_ret, EstdStringBuilder** i_self, EstdArena** allocator);
-extern size_t estd_string_builder_length(EstdStringBuilder* i_self);
+extern size_t estdStringBuilderLength(EstdStringBuilder* i_self);
 extern EstdResult estdReadStream(EstdString* o_ret, EstdArena** allocator, FILE* fp);
 extern EstdResult estdStringBuilderWrite(EstdStringBuilder** i_self, FILE* fp);
 
@@ -103,7 +103,7 @@ EstdResult estdStringBuilderBuild(EstdString* o_ret, EstdStringBuilder** i_self,
     return ESTD_SUCCESS;
 }
 
-size_t estd_string_builder_length(EstdStringBuilder* i_self) {
+size_t estdStringBuilderLength(EstdStringBuilder* i_self) {
     return i_self == NULL ? 0 : i_self->total_length;
 }
 
