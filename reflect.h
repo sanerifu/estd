@@ -33,4 +33,17 @@
 #define ESTD_GENERIC_CONSTRUCTOR(T, value) \
     _Generic((value), T##Cases(T, ___ESTD_UNION_GENERIC_CONSTRUCTOR_CASE, ___ESTD_UNION_GENERIC_CONSTRUCTOR_SEP))(value)
 
+#define ___ESTD_GET_CTX_T(T, _1, _2) T
+#define ___ESTD_GET_CTX_PREFIX(_1, prefix, _2) prefix
+#define ___ESTD_GET_CTX_VALUE(_1, _2, value) value
+#define ___ESTD_MATCH_CASE(ctx, T, name)                                                        \
+    case ___ESTD_CONCAT(___ESTD_CONCAT(___, ___ESTD_GET_CTX_T ctx), ___ESTD_CONCAT(_, name)): { \
+        ___ESTD_CONCAT(___ESTD_GET_CTX_PREFIX ctx, ___ESTD_CONCAT(_, name))(                    \
+            (___ESTD_GET_CTX_VALUE ctx).___data.___##name                                       \
+        )                                                                                       \
+    } break;
+#define ___ESTD_MATCH_SEP
+#define ESTD_MATCH(T, value, handler_prefix) \
+    switch (value.___type) { T##Cases((T, handler_prefix, value), ___ESTD_MATCH_CASE, ___ESTD_MATCH_SEP) }
+
 #endif
