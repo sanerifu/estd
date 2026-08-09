@@ -32,6 +32,15 @@ typedef enum {
         }                                                                 \
     } while (0)
 
+#define ESTD_BUBBLE_T(T, expr, fmt, ...)                                       \
+    do {                                                                  \
+        EstdResult ___estdmacro_result;                                   \
+        if ((___estdmacro_result = (EstdResult)(expr)) != ESTD_SUCCESS) { \
+            ESTD_TRACE(fmt, ##__VA_ARGS__);                               \
+            return (T)___estdmacro_result;                                   \
+        }                                                                 \
+    } while (0)
+
 #define ESTD_ASSERT(result, expr, fmt, ...)                                           \
     do {                                                                              \
         if (!(expr)) {                                                                \
