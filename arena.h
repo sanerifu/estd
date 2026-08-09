@@ -14,11 +14,11 @@ struct EstdArena {
 };
 
 extern EstdResult estdArenaAllocate(void** o_ret, EstdArena** io_self, size_t size, size_t alignment);
-#define estdArenaNew(o_ret, io_self) estdArenaAllocate((void**)o_ret, io_self, sizeof(**o_ret), alignof(**o_ret))
+#define estdArenaNew(o_ret, io_self) estdArenaAllocate((void**)o_ret, io_self, sizeof(**o_ret), __alignof__(**o_ret))
 #define estdArenaArray(o_ret, io_self, length) \
-    estdArenaAllocate((void**)o_ret, io_self, sizeof(**o_ret) * (length), alignof(**o_ret))
+    estdArenaAllocate((void**)o_ret, io_self, sizeof(**o_ret) * (length), __alignof__(**o_ret))
 #define estdArenaFsm(o_ret, io_self, size) \
-    estdArenaAllocate((void**)o_ret, io_self, sizeof(**o_ret) + size, alignof(**o_ret))
+    estdArenaAllocate((void**)o_ret, io_self, sizeof(**o_ret) + size, __alignof__(**o_ret))
 extern void estdArenaDestroy(EstdArena** io_self);
 extern void estdArenaDestroyWrapper(void* data);
 
