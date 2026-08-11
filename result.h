@@ -26,18 +26,29 @@
 
 ESTD_RESULT(EstdResult, ___ESTD_RESULTS);
 
-#define ESTD_THROW(result, fmt, ...)                 \
-    do {                                             \
-        ESTD_ERROR(#result ": " fmt, ##__VA_ARGS__); \
-        return result;                               \
+#define ESTD_THROW(result, fmt, ...)                                 \
+    do {                                                             \
+        ESTD_ERROR("Unsuccessful " fmt ": " #result, ##__VA_ARGS__); \
+        return result;                                               \
     } while (0)
 
 #define ESTD_BUBBLE(expr, fmt, ...)                                       \
     do {                                                                  \
         EstdResult ___estdmacro_result;                                   \
         if ((___estdmacro_result = (EstdResult)(expr)) != ESTD_SUCCESS) { \
-            ESTD_TRACE(fmt, ##__VA_ARGS__);                               \
+            ESTD_TRACE("Unsuccessful " fmt, ##__VA_ARGS__);               \
             return ___estdmacro_result;                                   \
+        }                                                                 \
+    } while (0)
+
+#define ESTD_OP(expr, fmt, ...)                                           \
+    do {                                                                  \
+        EstdResult ___estdmacro_result;                                   \
+        if ((___estdmacro_result = (EstdResult)(expr)) != ESTD_SUCCESS) { \
+            ESTD_TRACE("Unsuccessful " fmt, ##__VA_ARGS__);               \
+            return ___estdmacro_result;                                   \
+        } else {                                                          \
+            ESTD_DEBUG(fmt, ##__VA_ARGS__);                               \
         }                                                                 \
     } while (0)
 
@@ -47,6 +58,17 @@ ESTD_RESULT(EstdResult, ___ESTD_RESULTS);
         if ((___estdmacro_result = (EstdResult)(expr)) != ESTD_SUCCESS) { \
             ESTD_TRACE(fmt, ##__VA_ARGS__);                               \
             return (int)(___estdmacro_result != NULL);                    \
+        }                                                                 \
+    } while (0)
+
+#define ESTD_OP_INT(expr, fmt, ...)                                       \
+    do {                                                                  \
+        EstdResult ___estdmacro_result;                                   \
+        if ((___estdmacro_result = (EstdResult)(expr)) != ESTD_SUCCESS) { \
+            ESTD_TRACE("Unsuccessful " fmt, ##__VA_ARGS__);               \
+            return (int)(___estdmacro_result != NULL);                    \
+        } else {                                                          \
+            ESTD_DEBUG(fmt, ##__VA_ARGS__);                               \
         }                                                                 \
     } while (0)
 
