@@ -88,7 +88,7 @@ ESTD_RESULT(EstdResult, ___ESTD_RESULTS);
         }                                                                       \
     } while (0)
 
-#if (!defined(ESTD_RESULT_IMPLEMENTATION) || defined(ESTD_ALL_IMPLEMENTATION)) && !defined(__ESTD_RESULT_C__)
+#if (defined(ESTD_RESULT_IMPLEMENTATION) || defined(ESTD_ALL_IMPLEMENTATION)) && !defined(__ESTD_RESULT_C__)
 #define __ESTD_RESULT_C__
 
 ESTD_RESULT_DATA(___ESTD_RESULTS);
