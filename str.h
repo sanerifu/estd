@@ -24,6 +24,7 @@ struct EstdString {
 #define ESTD_SLICE(str, start, stop) ((EstdString){.length = ((stop) - (start)), .data = ((str).data + (start))})
 
 extern EstdString estdStringSplit(EstdString* io_string, EstdString delimiter);
+extern EstdString estdStringSplitReverse(EstdString* io_string, EstdString delimiter);
 extern EstdString estdStringTrim(EstdString string);
 extern int estdStringCompare(EstdString left, EstdString right);
 extern EstdResult estdStringDuplicate(EstdString* o_ret, EstdString string, EstdArena** allocator);
@@ -41,6 +42,7 @@ extern EstdResult estdStringToUint(uintmax_t* o_ret, EstdString self, int base);
 extern int estdStringScan(EstdString self, char const* fmt, ...);
 extern EstdString estdPathGetFilename(EstdString path);
 extern uint32_t estdCrc32(EstdString input);
+extern bool estdStringContains(EstdString haystack, EstdString needle);
 
 #endif
 
@@ -59,22 +61,47 @@ EstdString estdStringSplit(EstdString* io_string, EstdString delimiter) {
         *io_string = ESTD_STRING(NULL, 0);
         return string;
     }
-    EstdString ret = ESTD_STRING(string.data, 0);
+    EstdString ret = string;
     bool found = false;
+    intptr_t search_length = (intptr_t)(string.length - delimiter.length);
 
-    while ((string.length - ret.length) >= delimiter.length) {
-        if (memcmp(string.data + ret.length, delimiter.data, delimiter.length) == 0) {
+    for (intptr_t i = 0; i <= search_length; i++) {
+        if (memcmp(string.data + i, delimiter.data, delimiter.length) == 0) {
+            ret = ESTD_SLICE(string, 0, i);
+            string = ESTD_SLICE(string, i + delimiter.length, string.length);
             found = true;
             break;
         }
-        ret.length += 1;
     }
 
-    if (found) {
-        string.length -= ret.length + delimiter.length;
-        string.data += ret.length + delimiter.length;
-    } else {
-        ret.length = string.length;
+    if (!found) {
+        string.length = 0;
+    }
+
+    *io_string = string;
+    return ret;
+}
+
+EstdString estdStringSplitReverse(EstdString* io_string, EstdString delimiter) {
+    EstdString string = *io_string;
+    if (string.length < delimiter.length) {
+        *io_string = ESTD_STRING(NULL, 0);
+        return string;
+    }
+    EstdString ret = string;
+    bool found = false;
+    intptr_t search_length = (intptr_t)(string.length - delimiter.length);
+
+    for (intptr_t i = search_length; i >= 0; i--) {
+        if (memcmp(string.data + i, delimiter.data, delimiter.length) == 0) {
+            ret = ESTD_SLICE(string, i + delimiter.length, string.length);
+            string = ESTD_SLICE(string, 0, i);
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
         string.length = 0;
     }
 
@@ -161,12 +188,7 @@ bool estdStringHasPrefix(EstdString self, EstdString prefix) {
     if (self.length < prefix.length) {
         return false;
     }
-    for (size_t i = 0; i < prefix.length; i++) {
-        if (self.data[i] != prefix.data[i]) {
-            return false;
-        }
-    }
-    return true;
+    return memcmp(self.data, prefix.data, prefix.length) == 0;
 }
 
 bool estdStringHasSuffix(EstdString self, EstdString suffix) {
@@ -174,12 +196,7 @@ bool estdStringHasSuffix(EstdString self, EstdString suffix) {
         return false;
     }
     size_t diff = self.length - suffix.length;
-    for (size_t i = 0; i < suffix.length; i++) {
-        if (self.data[i + diff] != suffix.data[i]) {
-            return false;
-        }
-    }
-    return true;
+    return memcmp(self.data + diff, suffix.data, suffix.length) == 0;
 }
 
 void estdStringReverse(EstdString mut_self) {
@@ -462,6 +479,18 @@ uint32_t estdCrc32(EstdString input) {
     // Finalize the CRC-32 value by inverting all the bits
     crc32 ^= 0xFFFFFFFFu;
     return crc32;
+}
+
+bool estdStringContains(EstdString haystack, EstdString needle) {
+    if (haystack.length < needle.length) {
+        return false;
+    }
+    for (size_t i = 0; i < haystack.length - needle.length; i++) {
+        if (memcmp(haystack.data + i, needle.data, needle.length) == 0) {
+            return true;
+        }
+    }
+    return false;
 }
 
 #endif
