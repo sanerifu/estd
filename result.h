@@ -43,12 +43,11 @@ ESTD_RESULT(EstdResult, ___ESTD_RESULTS);
 
 #define ESTD_OP(expr, fmt, ...)                                           \
     do {                                                                  \
+        ESTD_DEBUG(fmt, ##__VA_ARGS__);                                   \
         EstdResult ___estdmacro_result;                                   \
         if ((___estdmacro_result = (EstdResult)(expr)) != ESTD_SUCCESS) { \
             ESTD_TRACE("Unsuccessful " fmt, ##__VA_ARGS__);               \
             return ___estdmacro_result;                                   \
-        } else {                                                          \
-            ESTD_DEBUG(fmt, ##__VA_ARGS__);                               \
         }                                                                 \
     } while (0)
 
@@ -63,12 +62,11 @@ ESTD_RESULT(EstdResult, ___ESTD_RESULTS);
 
 #define ESTD_OP_INT(expr, fmt, ...)                                       \
     do {                                                                  \
+        ESTD_DEBUG(fmt, ##__VA_ARGS__);                                   \
         EstdResult ___estdmacro_result;                                   \
         if ((___estdmacro_result = (EstdResult)(expr)) != ESTD_SUCCESS) { \
             ESTD_TRACE("Unsuccessful " fmt, ##__VA_ARGS__);               \
             return (int)(___estdmacro_result != NULL);                    \
-        } else {                                                          \
-            ESTD_DEBUG(fmt, ##__VA_ARGS__);                               \
         }                                                                 \
     } while (0)
 
